@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : Sorin Ciubotaru BearingPoint GmbH
  * @group             : 
- * @last modified on  : 02-20-2023
+ * @last modified on  : 02-21-2023
  * @last modified by  : Sorin Ciubotaru, BearingPoint GmbH
 **/
 public with sharing class AdoptionTriggerHandler {
@@ -16,7 +16,7 @@ public with sharing class AdoptionTriggerHandler {
             System.debug(adop.Animal__c);
             adoptionsFromTriggerIds.add(adop.Id);
 
-            if (newAdoptionsByAccountId.containsKey(adop.Account__c)) {
+            if (!newAdoptionsByAccountId.containsKey(adop.Account__c)) {
                 newAdoptionsByAccountId.put(adop.Account__c, new List<Adoption__c>());
             }
 
