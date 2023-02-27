@@ -17,16 +17,16 @@ public with sharing class AssignTaskForAccountsBatch implements Database.Batchab
         List<Task> oldTasks = [SELECT AccountId, ActivityDate FROM Task];
         Map<Id, List<Task>> tasksByAccountId = new Map<Id, List<Task>>();
         for(Task task : oldTasks) {
-            if(!tasksByAccount.containsKey(task.AccountId)){
-                tasksByAccount.put(task.AccountId, new List<Task>());
+            if(!tasksByAccountId.containsKey(task.AccountId)){
+                tasksByAccountId.put(task.AccountId, new List<Task>());
             } else {
-                tasksByAccount.get(task.AccountId).add(task);
+                tasksByAccountId.get(task.AccountId).add(task);
             }
         }
 
         for (Account account : accounts) {
-            if(tasksByAccount.containsKey(account.Id)) {
-                if(tasksByAccount.get(account.Id)[0].ActivityDate <= daysAgo) {
+            if(tasksByAccountId.containsKey(account.Id)) {
+                if(tasksByAccountId.get(account.Id)[0].ActivityDate <= daysAgo) {
                     Task newTask = new Task(Subject = 'Get in contact with customer', WhatId = account.Id, Status = 'Not Started', Priority = 'Normal', ActivityDate = Date.today());
                     tasksToInsert.add(newTask);
                 }
