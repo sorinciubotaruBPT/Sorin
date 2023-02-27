@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : Sorin Ciubotaru BearingPoint GmbH
  * @group             : 
- * @last modified on  : 02-21-2023
+ * @last modified on  : 02-27-2023
  * @last modified by  : Sorin Ciubotaru, BearingPoint GmbH
 **/
 public with sharing class AccountTriggerHandler {
@@ -12,7 +12,7 @@ public with sharing class AccountTriggerHandler {
             accountIds.add(a.Id);
         }
         List<Contract> contractsList = [SELECT AccountId, Name, ContractNumber, EndDate FROM Contract WHERE AccountId IN :accList];
-        Map<Id, List<Contract>> contractsByAccount = new Map<Id, List<Contract>>();
+        Map<Id, List<Contract>> contractsByAccountId = new Map<Id, List<Contract>>();
         for(Contract con : contractsList) {
             if(!contractsByAccount.containsKey(con.AccountId)){
                 contractsByAccount.put(con.AccountId, new List<Contract>());
@@ -31,4 +31,10 @@ public with sharing class AccountTriggerHandler {
             }
         }
     }
+
+    public static void generateCards(List<Account> newAccounts) {
+        for (Account acc : newAccounts) {
+            System.enqueueJob(new GenerateQrCodeQueueable(acc));
+        }
+    }  
 }
