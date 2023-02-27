@@ -12,9 +12,8 @@ public with sharing class AssignTaskForAccountsBatch implements Database.Batchab
     }
 
     public void execute(Database.BatchableContext bc, List<Account> accounts) {
-        Date daysAgo = Date.today().addDays(-60);
         List<Task> tasksToInsert = new List<Task>();
-        List<Task> oldTasks = [SELECT AccountId, ActivityDate FROM Task];
+        List<Task> oldTasks = [SELECT AccountId, ActivityDate FROM Task WHERE ActivityDate = LAST_N_DAYS:60];
         Map<Id, List<Task>> tasksByAccountId = new Map<Id, List<Task>>();
         for(Task task : oldTasks) {
             if(!tasksByAccountId.containsKey(task.AccountId)){
@@ -25,11 +24,9 @@ public with sharing class AssignTaskForAccountsBatch implements Database.Batchab
         }
 
         for (Account account : accounts) {
-            if(tasksByAccountId.containsKey(account.Id)) {
-                if(tasksByAccountId.get(account.Id)[0].ActivityDate <= daysAgo) {
-                    Task newTask = new Task(Subject = 'Get in contact with customer', WhatId = account.Id, Status = 'Not Started', Priority = 'Normal', ActivityDate = Date.today());
-                    tasksToInsert.add(newTask);
-                }
+            if(!tasksByAccountId.containsKey(account.Id)) {                
+                Task newTask = new Task(Subject = 'Get in contact with customer', WhatId = account.Id, Status = 'Not Started', Priority = 'Normal', ActivityDate = Date.today());
+                tasksToInsert.add(newTask);
             }
         }
 
